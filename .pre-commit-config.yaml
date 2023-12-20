@@ -1,0 +1,23 @@
+repos:
+-   repo: local
+    hooks:
+    -   id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        stages: [commit]
+        args:
+          [
+            "--max-line-length=80",
+            "--fail-under=8",
+            "--load-plugins=pylint_django",
+            "--rcfile=./.pylintrc"
+          ]
+    -   id: django-test
+        name: Run Django Tests
+        entry: poetry run python manage.py test
+        always_run: true
+        pass_filenames: false
+        language: system
+
