@@ -7,7 +7,7 @@ urlpatterns = [
     path('meta', usersview.handleMeta),
     path('idp-configuration', usersview.handleIDP),
     path('onboarding', usersview.handleOnboarding),
-    path('clearall', usersview.clearALL),
+    # path('clearall', usersview.clearALL),
     path('idp-groups', usersview.fetchOktaGroups),
     path('idp-role-mapping', usersview.handleIDPRoleMapping),
     path('session-user', usersview.handleSessionUser),
