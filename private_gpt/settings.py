@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 IS_PROD = os.getenv('IS_PROD')
-if IS_PROD.lower() == 'true':
+if IS_PROD and IS_PROD.lower() == 'true':
     is_prod = True
 else:
     is_prod = False
