@@ -239,3 +239,50 @@ class ChatHistoryDao(MongoConnection):
                 if message.get("isDeleted", False) == False
             ]
         })
+
+    def calculateStat(self, period):
+        return self.collection.aggregate([
+            {
+                "$match": {
+                    "messages.type": "USER_INPUT",
+                    "messages.createdAt": period['createdAt'],
+                    # "messages.createdAt": {"$gte": today.replace(hour=0, minute=0, second=0, microsecond=0), "$lt": today.replace(hour=23, minute=59, second=59, microsecond=999)},
+                }
+            },
+            {
+                "$addFields": {
+                    "piiArray": { "$objectToArray": "$piiToEntityTypeMap" }
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "piiArray": 1,
+                    "messages": {
+                        "$filter": {
+                            "input": "$messages",
+                            "as": "message",
+                            "cond": { 
+                                "$and": [
+                                    {"$eq": ["$$message.type", "USER_INPUT" ] },
+                                ]
+                            }
+                        }
+                    },
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "messageCount": {"$size": "$messages"},
+                    "piiCount": { "$sum": { "$size": "$piiArray" } }
+                }
+            },
+            {
+                "$group": {
+                    "_id": 0, # a group specification must include an _id
+                    "totalMessageCount": { "$sum": "$messageCount" },
+                    "totalPiiCount": { "$sum": "$piiCount" }
+                }
+            }
+        ])
