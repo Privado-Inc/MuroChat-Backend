@@ -2,7 +2,7 @@ import logging
 
 from rest_framework.decorators import api_view
 from utils.requestValidator import getTheIsUIFlag 
-from chats.services.chatService import bookmarkChatMessage, createMessages, deleteChatMessage, deleteChatUserMessage, \
+from chats.services.chatService import bookmarkChatMessage, calculateStat, createMessages, deleteChatMessage, deleteChatUserMessage, \
     getBookmarkedChatMessages, getChats, createOrUpdateChatMessage, getChatMessages, getChatsByFilter, \
     selfRemoveFromSharedList, \
     shareChats, getSharedChats, revokeSharedChat, importChat, removeBookmarkChatMessage, \
@@ -216,3 +216,16 @@ def handleLlmModels(request, modelId = None):
 
     if request.method == 'PUT':
         return updateLlmModel(data, modelId, isUI)
+
+
+@view_with_auth_permissions(
+    {
+        Permission.ReadEmployeeChats: ['GET']
+    },
+    ['GET']
+)
+def calculateStats(request):
+    isUI = getTheIsUIFlag(request)
+
+    if request.method == 'GET':
+        return calculateStat(isUI)

@@ -8,6 +8,7 @@ from chats.dao.ChatDao import TYPE_OF_AI, ChatDao
 from chats.dao.LlmModelDao import LlmModelDao
 from chats.dao.UserChatShareDao import UserChatShareDao
 from chats.dao.ChatHistoryDao import TYPE_OF_MESSAGE, ChatHistoryDao
+from stats.StatsDao import StatsDao
 from utils.EmailClient import EmailClient
 from utils.accessorUtils import getOrNone
 from utils.cryptoClient import getCryptoClient
@@ -31,6 +32,7 @@ chatHistoryDao = ChatHistoryDao()
 userChatShareDao = UserChatShareDao()
 llmModelDao = LlmModelDao()
 crypto = getCryptoClient()
+statsDao = StatsDao()
 
 def createChat(userId, data, isUI):
     log.info('createChat')
@@ -547,3 +549,7 @@ def isValidKey(vendor, key):
             return False
 
     return True
+
+def calculateStat(isUI):
+    data = statsDao.calculateStat()
+    return formatAndReturnResponse(data, status=status.HTTP_200_OK, isUI=isUI)

@@ -286,3 +286,36 @@ class ChatHistoryDao(MongoConnection):
                 }
             }
         ])
+    
+    def calculateTopRedactedSensitiveData(self, period):
+        return self.collection.aggregate([
+            {
+                "$match": {
+                    "messages.type": "USER_INPUT",
+                    "messages.createdAt": period['createdAt'],
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "piiToEntityTypeMap": 1,
+                    "messages": {
+                        "$filter": {
+                            "input": "$messages",
+                            "as": "message",
+                            "cond": { 
+                                "$and": [
+                                    {"$eq": ["$$message.type", "USER_INPUT" ] },
+                                ]
+                            }
+                        }
+                    },
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "piiToEntityTypeMap": 1,
+                }
+            },
+        ])
