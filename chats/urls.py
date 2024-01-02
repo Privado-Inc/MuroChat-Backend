@@ -16,5 +16,6 @@ urlpatterns = [
     path('employee-chats', chatview.handleEmployeeChats),
     path('chat/<chatId>/pin', chatview.handlePinnedChats),
     path('llm_models', chatview.handleLlmModels),
-    path('llm_models/<modelId>', chatview.handleLlmModels)
+    path('llm_models/<modelId>', chatview.handleLlmModels),
+    path('stats', chatview.calculateStats)
 ]
