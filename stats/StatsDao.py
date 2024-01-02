@@ -15,11 +15,6 @@ from bson.json_util import dumps
 import json
 from chats.data_firewall.DataFirewall import DataFirewall
 
-TYPE_OF_AI = {
-    'GPT': 'GPT',
-    'LLAMA': 'LLAMA',
-}
-
 chatHistoryDao = ChatHistoryDao()
 
 class StatsDao(MongoConnection):
@@ -102,7 +97,11 @@ class StatsDao(MongoConnection):
         stats = dict()
         for period in periods:
             stat = json.loads(dumps(chatHistoryDao.calculateStat(period)))
-            stats[str(period['createdAt']['$gte'].strftime('%d %b')) + ' to ' + str(period['createdAt']['$lt'].strftime('%d %b'))] = stat[0] if stat else {'_id': 0, 'totalMessageCount': 0, 'totalPiiCount': 0}
+            stats[
+                str(period['createdAt']['$gte'].strftime('%d %b')) 
+                + ' to ' +
+                str(period['createdAt']['$lt'].strftime('%d %b'))
+            ] = stat[0] if stat else {'_id': 0, 'totalMessageCount': 0, 'totalPiiCount': 0}
         return stats
 
     def calculateTopRedactedSensitiveData(self):
