@@ -43,6 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     oktaId = models.CharField(verbose_name='Invitor Id', max_length=128, null=True)
     email_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    last_login = models.DateTimeField()
 
     evKey = models.CharField(verbose_name='Last Name', max_length=128, default='')
     invitor_id = models.CharField(verbose_name='Invitor Id', max_length=128, null=True)

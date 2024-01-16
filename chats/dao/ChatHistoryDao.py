@@ -319,3 +319,53 @@ class ChatHistoryDao(MongoConnection):
                 }
             },
         ])
+
+    def calculateUsageAcrossUserGroups(self, period):
+        return self.collection.aggregate([
+            {
+                "$match": {
+                    "messages.type": "USER_INPUT",
+                    "messages.createdAt": period['createdAt'],
+                }
+            },
+            {
+                "$addFields": {
+                    "piiArray": { "$objectToArray": "$piiToEntityTypeMap" }
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "userId": 1,
+                    "piiArray": 1,
+                    "messages": {
+                        "$filter": {
+                            "input": "$messages",
+                            "as": "message",
+                            "cond": { 
+                                "$and": [
+                                    {"$eq": ["$$message.type", "USER_INPUT" ] },
+                                ]
+                            }
+                        }
+                    },
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "userId": 1,
+                    "messageCount": {"$size": "$messages"},
+                    "piiCount": { "$sum": { "$size": "$piiArray" } }
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$userId", # a group specification must include an _id
+                    # "userId": 1,
+                    "totalMessageCount": { "$sum": "$messageCount" },
+                    "totalPiiCount": { "$sum": "$piiCount" }
+                }
+            }
+        ])
+    
