@@ -25,7 +25,7 @@ from django.core.paginator import Paginator
 from utils.paginationUtils import paginationMeta
 from django.db.models import Q
 from utils.Permissions import Roles
-import logging
+import logging, pytz
 from bson.json_util import dumps
 from datetime import datetime
 
@@ -154,7 +154,7 @@ def doLoginOrSignup(userLoginOrSignUpData, isUI):
             loggedInUser = authenticate(username=email, isIdpUser=True)
             token, _ = getOrCreate(model=Token, user=loggedInUser)
             _, token = tokenExpireHandler(token)
-            exitingUser.last_login = datetime.now()
+            exitingUser.last_login = datetime.now().replace(tzinfo=pytz.utc)
             exitingUser.save()
             return formatAndReturnResponse(
                 {
