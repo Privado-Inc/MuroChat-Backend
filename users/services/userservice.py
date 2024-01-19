@@ -27,6 +27,7 @@ from django.db.models import Q
 from utils.Permissions import Roles
 import logging
 from bson.json_util import dumps
+from datetime import datetime
 
 log = logging.getLogger(__name__)
 
@@ -153,6 +154,8 @@ def doLoginOrSignup(userLoginOrSignUpData, isUI):
             loggedInUser = authenticate(username=email, isIdpUser=True)
             token, _ = getOrCreate(model=Token, user=loggedInUser)
             _, token = tokenExpireHandler(token)
+            exitingUser.last_login = datetime.now()
+            exitingUser.save()
             return formatAndReturnResponse(
                 {
                     'user': serializeUserObject(loggedInUser),
