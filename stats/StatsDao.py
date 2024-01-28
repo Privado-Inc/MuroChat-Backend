@@ -148,9 +148,9 @@ class StatsDao(MongoConnection):
             'activeUsers': stats[0]['activeUsers'],
             'promptSent': stats[0]['totalMessageCount'],
             'piiCount': stats[0]['totalPiiCount'],
-            'activeUsersPercent': (stats[0]['activeUsers']-stats[1]['activeUsers']) * 100 / stats[1]['activeUsers'],
-            'promptSentPercent': (stats[0]['totalMessageCount']-stats[1]['totalMessageCount']) * 100 / stats[1]['totalMessageCount'],
-            'piiCountPercent': (stats[0]['totalPiiCount']-stats[1]['totalPiiCount']) * 100 / stats[1]['totalPiiCount'],
+            'activeUsersPercent': round((stats[0]['activeUsers']-stats[1]['activeUsers']) * 100 / stats[1]['activeUsers'], 2),
+            'promptSentPercent': round((stats[0]['totalMessageCount']-stats[1]['totalMessageCount']) * 100 / stats[1]['totalMessageCount'], 2),
+            'piiCountPercent': round((stats[0]['totalPiiCount']-stats[1]['totalPiiCount']) * 100 / stats[1]['totalPiiCount'], 2),
         }
         
 
@@ -198,7 +198,7 @@ class StatsDao(MongoConnection):
                     statsByPeriod[userGroup]['totalMessageCount'] += stat['totalMessageCount']
                     statsByPeriod[userGroup]['totalPiiCount'] += stat['totalPiiCount']
             
-            stats.append(statsByPeriod[userGroup])
+                stats.append(statsByPeriod[userGroup])
         return stats
 
 
