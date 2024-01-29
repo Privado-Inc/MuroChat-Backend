@@ -138,19 +138,21 @@ class StatsDao(MongoConnection):
         for period in periods:
             stat = json.loads(dumps(chatHistoryDao.calculateStat(period)))
             if stat:
+                stat[0]['activeUsers'] = 1
+                stat[0]['time'] = ''
                 stats.append(stat[0])
             else:
-                stats.append({'_id': 0, 'totalMessageCount': 0, 'totalPiiCount': 0, 'activeUsers': 0})
+                stats.append({'_id': 0, 'totalMessageCount': 0, 'totalPiiCount': 0, 'activeUsers': 1, 'time': ''})
             activeUsers = len(self.getActiveUsers(period))
-            stat[0]['activeUsers'] = activeUsers if activeUsers else 1
+            stats[-1]['activeUsers'] = activeUsers if activeUsers else 1
             stats[-1]['time'] = str(period['createdAt']['$gte'].strftime('%d %b')) + ' to ' + str(period['createdAt']['$lt'].strftime('%d %b'))
         return {
             'activeUsers': stats[0]['activeUsers'],
             'promptSent': stats[0]['totalMessageCount'],
             'piiCount': stats[0]['totalPiiCount'],
-            'activeUsersPercent': (stats[0]['activeUsers']-stats[1]['activeUsers']) * 100 / stats[1]['activeUsers'],
-            'promptSentPercent': (stats[0]['totalMessageCount']-stats[1]['totalMessageCount']) * 100 / stats[1]['totalMessageCount'],
-            'piiCountPercent': (stats[0]['totalPiiCount']-stats[1]['totalPiiCount']) * 100 / stats[1]['totalPiiCount'],
+            'activeUsersPercent': round((stats[0]['activeUsers']-stats[1]['activeUsers']) * 100 / stats[1]['activeUsers'], 2),
+            'promptSentPercent': round((stats[0]['totalMessageCount']-stats[1]['totalMessageCount']) * 100 / stats[1]['totalMessageCount'] if stats[1]['totalMessageCount'] else 1, 2),
+            'piiCountPercent': round((stats[0]['totalPiiCount']-stats[1]['totalPiiCount']) * 100 / stats[1]['totalPiiCount'] if stats[1]['totalPiiCount'] else 1, 2),
         }
         
 
@@ -198,7 +200,7 @@ class StatsDao(MongoConnection):
                     statsByPeriod[userGroup]['totalMessageCount'] += stat['totalMessageCount']
                     statsByPeriod[userGroup]['totalPiiCount'] += stat['totalPiiCount']
             
-            stats.append(statsByPeriod[userGroup])
+                stats.append(statsByPeriod[userGroup])
         return stats
 
 
